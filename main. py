@@ -1,0 +1,27 @@
+import os
+import asyncio
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from flask import Flask
+import threading
+
+TOKEN = os.getenv("TELEGRAM_TOKEN")
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("LovePing is alive! 💖 I will ping you every day at 8am WAT")
+
+def keep_alive():
+    app = Flask('')
+    @app.route('/')
+    def home():
+        return "LovePing Bot Running"
+    threading.Thread(target=lambda: app.run(host='0.0.0.0', port=8080)).start()
+
+async def main():
+    keep_alive()
+    app = ApplicationBuilder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    await app.run_polling()
+
+if name == "main":
+    asyncio.run(main())
